@@ -1529,7 +1529,7 @@ input[type="range"]::-webkit-slider-thumb {
 <div class="toast" id="toast">Flyer HTML copied to clipboard!</div>
 
 <!-- SAVE MODAL -->
-<div class="modal-backdrop open" id="saveModal" onclick="closeSaveModalOutside(event)">
+<div class="modal-backdrop" id="saveModal" style="display:none" onclick="closeSaveModalOutside(event)">
   <div class="modal">
     <button class="modal-close" onclick="closeSaveModal()">✕</button>
     <div class="modal-title">💾 Save My Version</div>
@@ -1834,10 +1834,16 @@ function toggleEl(el, btn) {
 
 // ===== DOWNLOAD =====
 function openSaveModal() {
-  document.getElementById('saveModal').classList.add('open');
+  const m = document.getElementById('saveModal');
+  m.style.display = 'flex';
+  document.getElementById('save-progress').style.display = 'none';
+  document.getElementById('save-progress-bar').style.width = '0%';
+  setTimeout(() => m.classList.add('open'), 10);
 }
 function closeSaveModal() {
-  document.getElementById('saveModal').classList.remove('open');
+  const m = document.getElementById('saveModal');
+  m.classList.remove('open');
+  setTimeout(() => m.style.display = 'none', 260);
 }
 function closeSaveModalOutside(e) {
   if (e.target === document.getElementById('saveModal')) closeSaveModal();
@@ -1925,8 +1931,16 @@ ${keyframes}
 ${flyerHTML}
 </body></html>`;
   } else {
-    // Full editor version — just the current page with all state baked in
-    html = document.documentElement.outerHTML;
+    // Full editor version — close modal first so it doesn't appear on load
+    // Clone the document cleanly without the open modal
+    const clone = document.documentElement.cloneNode(true);
+    // Remove modal open class so it starts closed
+    const backdrop = clone.querySelector('.modal-backdrop');
+    if (backdrop) backdrop.classList.remove('open');
+    // Remove any toast show state
+    const toast = clone.querySelector('.toast');
+    if (toast) toast.classList.remove('show');
+    html = '<!DOCTYPE html>\n' + clone.outerHTML;
   }
 
   setTimeout(() => {
