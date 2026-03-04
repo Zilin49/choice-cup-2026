@@ -1,0 +1,2189 @@
+<html lang="en"><head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHOICE CUP — Flyer Editor</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&amp;family=Oswald:wght@300;400;600;700&amp;family=Barlow+Condensed:wght@300;400;600;700&amp;family=Barlow:wght@300;400;500&amp;display=swap" rel="stylesheet">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  background: #0d0d14;
+  color: #f0eaff;
+  font-family: 'Barlow', sans-serif;
+  height: 100vh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+/* ===== TOP BAR ===== */
+.topbar {
+  height: 52px;
+  background: #13111f;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  flex-shrink: 0;
+  z-index: 100;
+}
+.topbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.topbar-logo {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px;
+  letter-spacing: 3px;
+  color: #fff;
+}
+.topbar-badge {
+  background: rgba(107,53,200,0.3);
+  border: 1px solid rgba(155,109,255,0.3);
+  border-radius: 4px;
+  font-size: 10px;
+  letter-spacing: 2px;
+  color: #c4a0e8;
+  padding: 3px 8px;
+  font-family: 'Barlow Condensed', sans-serif;
+  text-transform: uppercase;
+}
+.topbar-actions {
+  display: flex;
+  gap: 10px;
+}
+.tb-btn {
+  background: rgba(107,53,200,0.8);
+  border: none;
+  color: #fff;
+  padding: 7px 18px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.tb-btn:hover { background: #7c3aed; transform: translateY(-1px); }
+.tb-btn.secondary {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.6);
+}
+.tb-btn.secondary:hover { border-color: rgba(255,255,255,0.4); color: #fff; background: rgba(255,255,255,0.05); }
+
+/* ===== MAIN LAYOUT ===== */
+.workspace {
+  display: flex;
+  flex: 1;
+  overflow: hidden;
+}
+
+/* ===== LEFT PANEL ===== */
+.panel {
+  width: 300px;
+  background: #13111f;
+  border-right: 1px solid rgba(255,255,255,0.06);
+  overflow-y: auto;
+  flex-shrink: 0;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(107,53,200,0.4) transparent;
+}
+.panel::-webkit-scrollbar { width: 4px; }
+.panel::-webkit-scrollbar-thumb { background: rgba(107,53,200,0.4); border-radius: 2px; }
+
+.panel-section {
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  padding: 16px;
+}
+.panel-section-header {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: rgba(155,109,255,0.7);
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.panel-section-header::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255,255,255,0.05);
+}
+
+.field-group {
+  margin-bottom: 14px;
+}
+.field-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: rgba(240,234,255,0.5);
+  text-transform: uppercase;
+  margin-bottom: 6px;
+  display: block;
+}
+
+/* Text inputs */
+.field-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  color: #f0eaff;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  transition: border-color 0.2s;
+  resize: none;
+}
+.field-input:focus {
+  border-color: rgba(155,109,255,0.5);
+  background: rgba(107,53,200,0.08);
+}
+.field-input::placeholder { color: rgba(255,255,255,0.2); }
+
+/* Color pickers */
+.color-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+.color-field {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.color-preview-wrap {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  padding: 6px 8px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+.color-preview-wrap:hover { border-color: rgba(155,109,255,0.4); }
+.color-swatch {
+  width: 22px; height: 22px;
+  border-radius: 3px;
+  border: 1px solid rgba(255,255,255,0.15);
+  flex-shrink: 0;
+  cursor: pointer;
+}
+input[type="color"] {
+  width: 0; height: 0;
+  opacity: 0;
+  position: absolute;
+  pointer-events: none;
+}
+.color-hex {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  color: rgba(240,234,255,0.6);
+  letter-spacing: 1px;
+}
+
+/* Presets */
+.preset-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  margin-top: 6px;
+}
+.preset-chip {
+  padding: 5px 12px;
+  border-radius: 20px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  cursor: pointer;
+  border: 1px solid rgba(255,255,255,0.1);
+  transition: all 0.2s;
+  color: rgba(255,255,255,0.7);
+  background: rgba(255,255,255,0.04);
+}
+.preset-chip:hover { transform: translateY(-1px); border-color: rgba(155,109,255,0.5); color: #fff; }
+.preset-chip.active { border-color: #9b6dff; background: rgba(107,53,200,0.3); color: #fff; }
+
+/* Font select */
+.font-select {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 4px;
+  color: #f0eaff;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  padding: 8px 10px;
+  outline: none;
+  cursor: pointer;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='rgba(155,109,255,0.6)' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
+  padding-right: 28px;
+}
+.font-select:focus { border-color: rgba(155,109,255,0.5); }
+.font-select option { background: #1a1530; }
+
+/* Toggle */
+.toggle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 0;
+}
+.toggle-label {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px;
+  color: rgba(240,234,255,0.6);
+}
+.toggle {
+  width: 34px; height: 18px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 9px;
+  position: relative;
+  cursor: pointer;
+  transition: background 0.2s;
+  flex-shrink: 0;
+}
+.toggle.on { background: #7c3aed; }
+.toggle::after {
+  content: '';
+  position: absolute;
+  width: 12px; height: 12px;
+  background: white;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: left 0.2s;
+}
+.toggle.on::after { left: 19px; }
+
+/* Range slider */
+.range-wrap {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  height: 3px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 2px;
+  outline: none;
+  cursor: pointer;
+}
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 14px; height: 14px;
+  background: #9b6dff;
+  border-radius: 50%;
+  border: 2px solid rgba(255,255,255,0.3);
+}
+.range-val {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  color: rgba(155,109,255,0.8);
+  min-width: 28px;
+  text-align: right;
+}
+
+/* ===== CANVAS AREA ===== */
+.canvas-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: auto;
+  background: #0a0910;
+  background-image: radial-gradient(rgba(107,53,200,0.06) 1px, transparent 1px);
+  background-size: 24px 24px;
+  padding: 32px;
+  position: relative;
+}
+
+.zoom-controls {
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  gap: 6px;
+  z-index: 10;
+}
+.zoom-btn {
+  width: 30px; height: 30px;
+  background: rgba(19,17,31,0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  color: rgba(255,255,255,0.7);
+  font-size: 14px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+}
+.zoom-btn:hover { border-color: rgba(155,109,255,0.5); color: #fff; }
+.zoom-label {
+  background: rgba(19,17,31,0.9);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 4px;
+  color: rgba(255,255,255,0.4);
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 11px;
+  letter-spacing: 1px;
+  padding: 0 10px;
+  display: flex;
+  align-items: center;
+  min-width: 44px;
+  justify-content: center;
+}
+
+/* ===== FLYER ===== */
+#flyer {
+  width: 600px;
+  min-height: 820px;
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  transform-origin: top center;
+  box-shadow: 0 40px 120px rgba(0,0,0,0.8), 0 0 0 1px rgba(255,255,255,0.05);
+  transition: box-shadow 0.3s;
+  flex-shrink: 0;
+  font-family: 'Bebas Neue', sans-serif;
+}
+
+/* Flyer internal styles */
+.flyer-bg { position: absolute; inset: 0; z-index: 0; transition: background 0.3s; }
+.flyer-field {
+  position: absolute; bottom: 0; left: 0; right: 0;
+  height: 220px; z-index: 1;
+  background: linear-gradient(to top, rgba(8,40,18,0.9), transparent);
+  transition: opacity 0.3s;
+}
+.flyer-corner {
+  position: absolute; width: 28px; height: 28px; z-index: 5;
+}
+.flyer-corner.tl { top: 14px; left: 14px; border-top: 2px solid; border-left: 2px solid; }
+.flyer-corner.tr { top: 14px; right: 14px; border-top: 2px solid; border-right: 2px solid; }
+.flyer-corner.bl { bottom: 14px; left: 14px; border-bottom: 2px solid; border-left: 2px solid; }
+.flyer-corner.br { bottom: 14px; right: 14px; border-bottom: 2px solid; border-right: 2px solid; }
+
+.flyer-stars span {
+  position: absolute; width: 3px; height: 3px;
+  border-radius: 50%; animation: twinkle 3s infinite alternate;
+}
+@keyframes twinkle { from{opacity:0.2;} to{opacity:1;} }
+
+.flyer-content {
+  position: relative; z-index: 10;
+  display: flex; flex-direction: column;
+  align-items: center;
+  width: 100%;
+  padding: 0 40px;
+  flex: 1;
+}
+
+.flyer-header {
+  text-align: center;
+  padding: 28px 0 10px;
+  width: 100%;
+}
+.flyer-program-badge {
+  display: inline-block;
+  padding: 5px 16px;
+  border-radius: 2px;
+  font-family: 'Oswald', sans-serif;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: white;
+  margin-bottom: 6px;
+  transition: background 0.3s;
+}
+.flyer-presents {
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px;
+  letter-spacing: 4px;
+  text-transform: uppercase;
+  opacity: 0.4;
+  margin-bottom: 2px;
+  transition: color 0.2s;
+}
+
+.flyer-title-block { text-align: center; }
+.flyer-eyebrow {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px;
+  letter-spacing: 10px;
+  opacity: 0.5;
+  text-transform: uppercase;
+  transition: all 0.2s;
+}
+.flyer-title-main {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 100px;
+  line-height: 0.88;
+  letter-spacing: 4px;
+  transition: all 0.2s;
+  word-break: break-word;
+  text-align: center;
+}
+.flyer-title-sub {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 28px;
+  letter-spacing: 14px;
+  transition: all 0.2s;
+  margin-top: 2px;
+}
+
+.flyer-divider {
+  display: flex; align-items: center; gap: 10px;
+  width: 80%; margin: 10px auto;
+}
+.flyer-divider-line { flex:1; height:1px; opacity: 0.4; transition: background 0.3s; }
+.flyer-divider-diamond { width:7px; height:7px; transform: rotate(45deg); transition: background 0.3s; }
+
+/* Trophy */
+.flyer-trophy-area {
+  position: relative;
+  display: flex; justify-content: center;
+  height: 155px; width: 100%;
+  margin: 4px 0;
+}
+.flyer-trophy-glow {
+  position: absolute;
+  width: 160px; height: 160px;
+  border-radius: 50%;
+  top: 50%; left: 50%;
+  transform: translate(-50%,-50%);
+  animation: pglow 2.5s ease-in-out infinite alternate;
+  transition: background 0.3s;
+}
+@keyframes pglow {
+  from { transform: translate(-50%,-50%) scale(0.9); opacity:0.5; }
+  to { transform: translate(-50%,-50%) scale(1.1); opacity:1; }
+}
+.trophy-svg-el { 
+  filter: drop-shadow(0 0 16px rgba(155,109,255,0.7));
+  animation: tfloat 4s ease-in-out infinite;
+  position: relative; z-index: 2;
+}
+@keyframes tfloat { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-10px)} }
+
+/* Info row */
+.flyer-info-row {
+  display: flex; gap: 0;
+  width: 82%; border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.1);
+  margin: 8px 0;
+}
+.flyer-info-card {
+  flex: 1; padding: 10px 8px; text-align: center;
+  background: rgba(0,0,0,0.3);
+  border-right: 1px solid rgba(255,255,255,0.07);
+}
+.flyer-info-card:last-child { border-right: none; }
+.flyer-info-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8px; letter-spacing: 2px;
+  text-transform: uppercase; opacity: 0.7;
+  margin-bottom: 4px; transition: color 0.2s;
+}
+.flyer-info-val {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; color: white; letter-spacing: 1px;
+  transition: all 0.2s;
+}
+.flyer-info-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 8px; opacity: 0.4; margin-top: 2px;
+}
+
+/* Tagline */
+.flyer-tagline {
+  font-family: 'Oswald', sans-serif;
+  font-weight: 300;
+  font-size: 12px; letter-spacing: 2px;
+  text-align: center;
+  opacity: 0.5; text-transform: uppercase;
+  line-height: 1.8; margin: 4px 0;
+  transition: all 0.2s;
+}
+.flyer-tagline em { font-style: normal; font-weight: 600; opacity: 1; transition: color 0.2s; }
+
+/* QR block */
+.flyer-qr-row {
+  display: flex; align-items: center; gap: 18px;
+  width: 82%;
+  border-radius: 4px;
+  padding: 14px 18px;
+  margin: 10px 0 0;
+  transition: background 0.3s, border-color 0.3s;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.flyer-qr-box {
+  width: 72px; height: 72px;
+  background: white; border-radius: 4px;
+  padding: 5px; flex-shrink: 0;
+  display: flex; align-items: center; justify-content: center;
+}
+.flyer-qr-text { flex: 1; }
+.flyer-qr-eyebrow {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8px; letter-spacing: 2.5px;
+  text-transform: uppercase; margin-bottom: 3px;
+  transition: color 0.2s;
+}
+.flyer-qr-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 18px; letter-spacing: 1px; line-height: 1; color: white;
+  transition: all 0.2s;
+}
+.flyer-qr-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px; opacity: 0.45; margin-top: 4px; line-height: 1.5;
+}
+
+.flyer-footer {
+  width: 100%; margin-top: auto;
+  padding: 12px 30px 16px;
+  display: flex; justify-content: space-between; align-items: center;
+  border-top: 1px solid rgba(255,255,255,0.06);
+  position: relative; z-index: 10;
+}
+.flyer-footer-l, .flyer-footer-r {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8px; letter-spacing: 2px;
+  text-transform: uppercase; opacity: 0.25;
+}
+
+/* Editable hint */
+[contenteditable]:hover { outline: 1px dashed rgba(155,109,255,0.3); border-radius: 2px; }
+[contenteditable]:focus { outline: 1px solid rgba(155,109,255,0.6); border-radius: 2px; background: rgba(107,53,200,0.05); }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: 24px; left: 50%;
+  transform: translateX(-50%) translateY(10px);
+  background: rgba(107,53,200,0.95);
+  border: 1px solid rgba(155,109,255,0.4);
+  border-radius: 40px;
+  padding: 10px 24px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; letter-spacing: 2px; color: #fff;
+  z-index: 999; opacity: 0;
+  transition: all 0.3s; pointer-events: none;
+}
+.toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* Schedule teaser bar */
+.flyer-schedule-bar {
+  display: flex;
+  width: 82%;
+  margin: 8px 0;
+  border-radius: 4px;
+  overflow: hidden;
+  border: 1px solid rgba(255,255,255,0.08);
+}
+.flyer-schedule-step {
+  flex: 1;
+  padding: 7px 4px;
+  text-align: center;
+  background: rgba(0,0,0,0.25);
+  border-right: 1px solid rgba(255,255,255,0.06);
+  position: relative;
+}
+.flyer-schedule-step:last-child { border-right: none; }
+.flyer-schedule-step::after {
+  content: '›';
+  position: absolute;
+  right: -7px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 10px;
+  color: rgba(255,255,255,0.2);
+  z-index: 2;
+}
+.flyer-schedule-step:last-child::after { display: none; }
+.flyer-schedule-icon { font-size: 13px; display: block; margin-bottom: 2px; }
+.flyer-schedule-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8px; letter-spacing: 1.5px;
+  text-transform: uppercase; color: rgba(255,255,255,0.5);
+  line-height: 1.2;
+}
+.flyer-schedule-time {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 11px; color: rgba(255,255,255,0.3);
+  display: block; margin-top: 1px;
+}
+
+/* Team teaser */
+.flyer-team-teaser {
+  width: 82%;
+  margin: 6px 0;
+  border-radius: 4px;
+  padding: 10px 14px;
+  background: rgba(0,0,0,0.2);
+  border: 1px dashed rgba(255,255,255,0.12);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.flyer-team-flags {
+  font-size: 16px;
+  letter-spacing: 2px;
+  flex-shrink: 0;
+}
+.flyer-team-text { flex: 1; }
+.flyer-team-headline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 14px; letter-spacing: 1px; color: white; line-height: 1;
+}
+.flyer-team-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 9px; color: rgba(255,255,255,0.4);
+  margin-top: 2px; line-height: 1.4;
+}
+
+/* RSVP bar */
+.flyer-rsvp-bar {
+  width: 82%;
+  margin: 6px 0;
+  border-radius: 4px;
+  padding: 9px 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: 1px solid rgba(255,255,255,0.1);
+  background: rgba(0,0,0,0.2);
+}
+.flyer-rsvp-left { display: flex; align-items: center; gap: 8px; }
+.flyer-rsvp-icon { font-size: 16px; }
+.flyer-rsvp-text {}
+.flyer-rsvp-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 8px; letter-spacing: 2.5px;
+  text-transform: uppercase; margin-bottom: 2px;
+}
+.flyer-rsvp-deadline {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 15px; color: white; letter-spacing: 1px; line-height: 1;
+}
+.flyer-rsvp-pill {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; letter-spacing: 2px;
+  color: white; text-transform: uppercase;
+  padding: 4px 12px; border-radius: 20px;
+  white-space: nowrap; flex-shrink: 0;
+}
+
+/* Upload zone *
+/* QR upload slots on flyer */
+.flyer-qr-upload-slot {
+  width: 52px; height: 52px;
+  background: rgba(255,255,255,0.06);
+  border: 1.5px dashed rgba(255,255,255,0.2);
+  border-radius: 4px;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; flex-shrink: 0;
+  transition: border-color 0.2s, background 0.2s;
+  overflow: hidden;
+  position: relative;
+}
+.flyer-qr-upload-slot:hover {
+  border-color: rgba(155,109,255,0.6);
+  background: rgba(107,53,200,0.15);
+}
+.qr-slot-inner {
+  display: flex; flex-direction: column;
+  align-items: center; justify-content: center; gap: 2px;
+  width: 100%; height: 100%;
+}
+.qr-slot-icon { font-size: 14px; line-height: 1; }
+.qr-slot-hint {
+  font-family: 'Barlow', sans-serif;
+  font-size: 7px; color: rgba(255,255,255,0.35);
+  letter-spacing: 0.3px; text-align: center;
+}
+.qr-uploaded-img {
+  width: 100%; height: 100%;
+  object-fit: cover; border-radius: 3px;
+  display: block;
+}
+
+.upload-zone {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border: 1.5px dashed rgba(155,109,255,0.3);
+  border-radius: 6px;
+  padding: 20px 12px;
+  cursor: pointer;
+  transition: all 0.2s;
+  background: rgba(107,53,200,0.05);
+  width: 100%;
+}
+.upload-zone:hover, .upload-zone.dragover {
+  border-color: rgba(155,109,255,0.7);
+  background: rgba(107,53,200,0.12);
+}
+.upload-icon { font-size: 24px; }
+.upload-hint {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 12px;
+  letter-spacing: 1px;
+  color: rgba(240,234,255,0.6);
+}
+.upload-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px;
+  color: rgba(240,234,255,0.3);
+}
+.upload-preview {
+  width: 100%;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid rgba(255,255,255,0.1);
+  display: block;
+  margin-bottom: 8px;
+}
+/* Flyer bg image layer */
+#flyer-bg-img {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  opacity: 0.6;
+  transition: opacity 0.3s;
+  pointer-events: none;
+}
+#flyer-bg-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transition: background 0.3s;
+}
+
+.save-btn {
+  background: linear-gradient(135deg, #7c3aed, #4b2e83) !important;
+  box-shadow: 0 0 16px rgba(124,58,237,0.4);
+  font-size: 13px !important;
+  padding: 8px 22px !important;
+}
+.save-btn:hover {
+  box-shadow: 0 0 24px rgba(124,58,237,0.7) !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Save modal */
+.modal-backdrop {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.7);
+  backdrop-filter: blur(6px);
+  z-index: 2000;
+  display: flex; align-items: center; justify-content: center;
+  opacity: 0; pointer-events: none;
+  transition: opacity 0.25s;
+}
+.modal-backdrop.open { opacity: 1; pointer-events: all; }
+.modal {
+  background: #1a1530;
+  border: 1px solid rgba(155,109,255,0.25);
+  border-radius: 10px;
+  padding: 32px;
+  width: 460px;
+  max-width: 90vw;
+  transform: translateY(16px);
+  transition: transform 0.25s;
+  position: relative;
+}
+.modal-backdrop.open .modal { transform: translateY(0); }
+.modal-close {
+  position: absolute; top: 14px; right: 16px;
+  background: none; border: none;
+  color: rgba(255,255,255,0.35); font-size: 18px;
+  cursor: pointer; padding: 4px 8px; border-radius: 4px;
+  transition: color 0.2s, background 0.2s;
+}
+.modal-close:hover { color: #fff; background: rgba(255,255,255,0.06); }
+.modal-title {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 32px; letter-spacing: 2px; color: #fff;
+  margin-bottom: 4px;
+}
+.modal-sub {
+  font-family: 'Barlow', sans-serif;
+  font-size: 12px; color: rgba(255,255,255,0.4);
+  margin-bottom: 24px; line-height: 1.6;
+}
+.modal-field { margin-bottom: 16px; }
+.modal-label {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 10px; letter-spacing: 2.5px;
+  text-transform: uppercase; color: rgba(155,109,255,0.8);
+  display: block; margin-bottom: 6px;
+}
+.modal-input {
+  width: 100%;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 5px;
+  color: #f0eaff;
+  font-family: 'Barlow', sans-serif;
+  font-size: 13px;
+  padding: 10px 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+.modal-input:focus { border-color: rgba(155,109,255,0.5); }
+.modal-divider {
+  height: 1px; background: rgba(255,255,255,0.06);
+  margin: 20px 0;
+}
+.modal-options {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 20px;
+}
+.modal-option {
+  background: rgba(255,255,255,0.03);
+  border: 1px solid rgba(255,255,255,0.08);
+  border-radius: 6px; padding: 14px 12px;
+  cursor: pointer; transition: all 0.2s;
+  text-align: center;
+}
+.modal-option:hover, .modal-option.selected {
+  border-color: rgba(155,109,255,0.5);
+  background: rgba(107,53,200,0.15);
+}
+.modal-option-icon { font-size: 22px; margin-bottom: 6px; }
+.modal-option-title {
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 1px;
+  color: #fff; margin-bottom: 3px;
+}
+.modal-option-desc {
+  font-family: 'Barlow', sans-serif;
+  font-size: 10px; color: rgba(255,255,255,0.35);
+  line-height: 1.4;
+}
+.modal-actions { display: flex; gap: 10px; }
+.modal-btn {
+  flex: 1; padding: 12px;
+  font-family: 'Barlow Condensed', sans-serif;
+  font-size: 13px; font-weight: 700; letter-spacing: 2px;
+  text-transform: uppercase; border-radius: 5px;
+  border: none; cursor: pointer; transition: all 0.2s;
+}
+.modal-btn-primary {
+  background: linear-gradient(135deg, #7c3aed, #4b2e83);
+  color: #fff;
+}
+.modal-btn-primary:hover { background: linear-gradient(135deg, #9b6dff, #6b35c8); transform: translateY(-1px); }
+.modal-btn-secondary {
+  background: transparent;
+  border: 1px solid rgba(255,255,255,0.1);
+  color: rgba(255,255,255,0.5);
+}
+.modal-btn-secondary:hover { color: #fff; border-color: rgba(255,255,255,0.3); }
+.modal-progress {
+  display: none; margin-top: 16px;
+  background: rgba(255,255,255,0.06);
+  border-radius: 4px; overflow: hidden; height: 4px;
+}
+.modal-progress-bar {
+  height: 100%; width: 0%;
+  background: linear-gradient(to right, #7c3aed, #c4a0e8);
+  transition: width 0.4s ease;
+  border-radius: 4px;
+}
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <div class="topbar-left">
+    <div class="topbar-logo">⚕ CHOICE CUP</div>
+    <div class="topbar-badge">Flyer Editor</div>
+  </div>
+  <div class="topbar-actions">
+    <button class="tb-btn secondary" onclick="resetDefaults()">↺ Reset</button>
+    <button class="tb-btn secondary" onclick="copyHTML()">⎘ Copy HTML</button>
+    <button class="tb-btn save-btn" onclick="openSaveModal()">💾 Save My Version</button>
+  </div>
+</div>
+
+<div class="workspace">
+
+  <!-- LEFT PANEL -->
+  <div class="panel">
+
+    <!-- TEXT CONTENT -->
+    <div class="panel-section">
+      <div class="panel-section-header">Text Content</div>
+
+      <div class="field-group">
+        <label class="field-label">Program / Badge</label>
+        <input class="field-input" type="text" id="txt-badge" value="⚕ CHOICE Institute" oninput="sync('badge',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Eyebrow (above title)</label>
+        <input class="field-input" type="text" id="txt-eyebrow" value="Annual Retreat" oninput="sync('eyebrow',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Main Title</label>
+        <input class="field-input" type="text" id="txt-title" value="CHOICE CUP" oninput="sync('title',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Year / Subtitle</label>
+        <input class="field-input" type="text" id="txt-year" value="2026" oninput="sync('year',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Tagline</label>
+        <textarea class="field-input" id="txt-tagline" rows="2" oninput="sync('tagline',this.value)">Compete · Collaborate · Celebrate</textarea>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Tagline Highlight</label>
+        <input class="field-input" type="text" id="txt-highlight" value="One retreat. Many champions." oninput="sync('highlight',this.value)">
+      </div>
+    </div>
+
+    <!-- EVENT DETAILS -->
+    <div class="panel-section">
+      <div class="panel-section-header">Event Details</div>
+
+      <div class="field-group">
+        <label class="field-label">Date</label>
+        <input class="field-input" type="text" id="txt-date" value="TBD 2026" oninput="sync('date',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Location</label>
+        <input class="field-input" type="text" id="txt-location" value="UW Campus" oninput="sync('location',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Format</label>
+        <input class="field-input" type="text" id="txt-format" value="Full Day" oninput="sync('format',this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">QR Call-to-Action</label>
+        <input class="field-input" type="text" id="txt-qr-cta" value="Vote for Food Truck" oninput="sync('qrcta',this.value)">
+      </div>
+      <div class="field-group" style="margin-top:6px">
+        <label class="field-label">Card Label Icons</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px">
+          <input class="field-input" type="text" id="txt-label-date" value="📅 Date" style="font-size:11px;padding:6px 8px" oninput="applyCardLabel('date',this.value)" placeholder="Date label">
+          <input class="field-input" type="text" id="txt-label-loc" value="📍 Location" style="font-size:11px;padding:6px 8px" oninput="applyCardLabel('loc',this.value)" placeholder="Location label">
+          <input class="field-input" type="text" id="txt-label-fmt" value="🎯 Format" style="font-size:11px;padding:6px 8px" oninput="applyCardLabel('fmt',this.value)" placeholder="Format label">
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Card Value Font Size</label>
+        <div class="range-wrap">
+          <input type="range" id="range-cardvalsize" min="10" max="36" value="18" oninput="applyCardValSize(this.value)">
+          <span class="range-val" id="val-cardvalsize">18</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Card Label Font Size</label>
+        <div class="range-wrap">
+          <input type="range" id="range-cardlblsize" min="6" max="16" value="8" oninput="applyCardLblSize(this.value)">
+          <span class="range-val" id="val-cardlblsize">8</span>
+        </div>
+      </div>
+      <div class="color-row">
+        <div class="color-field">
+          <label class="field-label">Card Value Color</label>
+          <div class="color-preview-wrap" onclick="openColor('cardval')">
+            <div class="color-swatch" id="swatch-cardval" style="background:#ffffff"></div>
+            <span class="color-hex" id="hex-cardval">#ffffff</span>
+          </div>
+          <input type="color" id="color-cardval" value="#ffffff" oninput="applyColor('cardval',this.value)">
+        </div>
+        <div class="color-field">
+          <label class="field-label">Card Background</label>
+          <div class="color-preview-wrap" onclick="openColor('cardbg')">
+            <div class="color-swatch" id="swatch-cardbg" style="background:#000000"></div>
+            <span class="color-hex" id="hex-cardbg">#000000</span>
+          </div>
+          <input type="color" id="color-cardbg" value="#000000" oninput="applyColor('cardbg',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- BACKGROUND IMAGE -->
+    <div class="panel-section">
+      <div class="panel-section-header">Background Image</div>
+
+      <div class="field-group">
+        <label class="field-label">Upload Image</label>
+        <label class="upload-zone" id="upload-zone" for="bg-upload">
+          <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="handleBgUpload(this)">
+          <div class="upload-icon">🖼</div>
+          <div class="upload-hint">Click or drag an image here</div>
+          <div class="upload-sub">JPG, PNG, GIF, WebP</div>
+        </label>
+      </div>
+
+      <div id="bg-image-controls" style="display:none">
+        <div class="field-group">
+          <label class="field-label">Image Opacity</label>
+          <div class="range-wrap">
+            <input type="range" id="range-bgopacity" min="0" max="100" value="60" oninput="applyBgOpacity(this.value)">
+            <span class="range-val" id="val-bgopacity">60%</span>
+          </div>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Image Position</label>
+          <select class="font-select" id="sel-bgpos" onchange="applyBgPos(this.value)">
+            <option value="center center">Center</option>
+            <option value="top center">Top</option>
+            <option value="bottom center">Bottom</option>
+            <option value="center left">Left</option>
+            <option value="center right">Right</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Image Size</label>
+          <select class="font-select" id="sel-bgsize" onchange="applyBgSize(this.value)">
+            <option value="cover">Cover (fill)</option>
+            <option value="contain">Contain (fit)</option>
+            <option value="100% 100%">Stretch</option>
+          </select>
+        </div>
+        <div class="field-group">
+          <label class="field-label">Overlay Darkness</label>
+          <div class="range-wrap">
+            <input type="range" id="range-overlay" min="0" max="100" value="55" oninput="applyOverlay(this.value)">
+            <span class="range-val" id="val-overlay">55%</span>
+          </div>
+        </div>
+        <div style="display:flex;gap:8px;margin-top:4px">
+          <button class="tb-btn secondary" style="flex:1;font-size:11px;padding:7px 10px" onclick="removeBgImage()">✕ Remove Image</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- COLORS -->
+    <div class="panel-section">
+      <div class="panel-section-header">Colors</div>
+
+      <!-- Presets -->
+      <div class="field-group">
+        <label class="field-label">Theme Presets</label>
+        <div class="preset-row">
+          <div class="preset-chip active" onclick="applyPreset('uw')" id="preset-uw">UW Purple</div>
+          <div class="preset-chip" onclick="applyPreset('midnight')" id="preset-midnight">Midnight</div>
+          <div class="preset-chip" onclick="applyPreset('forest')" id="preset-forest">Forest</div>
+          <div class="preset-chip" onclick="applyPreset('gold')" id="preset-gold">Gold Cup</div>
+          <div class="preset-chip" onclick="applyPreset('crimson')" id="preset-crimson">Crimson</div>
+          <div class="preset-chip" onclick="applyPreset('ocean')" id="preset-ocean">Ocean</div>
+        </div>
+      </div>
+
+      <div class="color-row">
+        <div class="color-field">
+          <label class="field-label">Background</label>
+          <div class="color-preview-wrap" onclick="openColor('bg')">
+            <div class="color-swatch" id="swatch-bg" style="background:#1a0a2e"></div>
+            <span class="color-hex" id="hex-bg">#1a0a2e</span>
+          </div>
+          <input type="color" id="color-bg" value="#1a0a2e" oninput="applyColor('bg',this.value)">
+        </div>
+        <div class="color-field">
+          <label class="field-label">Accent</label>
+          <div class="color-preview-wrap" onclick="openColor('accent')">
+            <div class="color-swatch" id="swatch-accent" style="background:#9b6dff"></div>
+            <span class="color-hex" id="hex-accent">#9b6dff</span>
+          </div>
+          <input type="color" id="color-accent" value="#9b6dff" oninput="applyColor('accent',this.value)">
+        </div>
+      </div>
+      <div class="color-row" style="margin-top:10px">
+        <div class="color-field">
+          <label class="field-label">Title Color</label>
+          <div class="color-preview-wrap" onclick="openColor('titlec')">
+            <div class="color-swatch" id="swatch-titlec" style="background:#ffffff"></div>
+            <span class="color-hex" id="hex-titlec">#ffffff</span>
+          </div>
+          <input type="color" id="color-titlec" value="#ffffff" oninput="applyColor('titlec',this.value)">
+        </div>
+        <div class="color-field">
+          <label class="field-label">Highlight</label>
+          <div class="color-preview-wrap" onclick="openColor('highlight')">
+            <div class="color-swatch" id="swatch-highlight" style="background:#c4a0e8"></div>
+            <span class="color-hex" id="hex-highlight">#c4a0e8</span>
+          </div>
+          <input type="color" id="color-highlight" value="#c4a0e8" oninput="applyColor('highlight',this.value)">
+        </div>
+      </div>
+    </div>
+
+    <!-- TYPOGRAPHY -->
+    <div class="panel-section">
+      <div class="panel-section-header">Typography</div>
+
+      <div class="field-group">
+        <label class="field-label">Title Font</label>
+        <select class="font-select" id="font-title" onchange="applyFont('title',this.value)">
+          <option value="'Bebas Neue', sans-serif" selected="">Bebas Neue</option>
+          <option value="'Oswald', sans-serif">Oswald</option>
+          <option value="'Barlow Condensed', sans-serif">Barlow Condensed</option>
+          <option value="Georgia, serif">Georgia</option>
+          <option value="'Courier New', monospace">Courier New</option>
+        </select>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Title Size</label>
+        <div class="range-wrap">
+          <input type="range" id="range-titlesize" min="50" max="130" value="100" oninput="applyTitleSize(this.value)">
+          <span class="range-val" id="val-titlesize">100</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Subtitle Size</label>
+        <div class="range-wrap">
+          <input type="range" id="range-subsize" min="14" max="60" value="28" oninput="applySubSize(this.value)">
+          <span class="range-val" id="val-subsize">28</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEW ELEMENTS -->
+    <div class="panel-section">
+      <div class="panel-section-header">Schedule Bar</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px">
+        <div>
+          <label class="field-label" style="margin-bottom:4px;display:block">Step 1</label>
+          <input class="field-input" type="text" value="Morning" style="font-size:11px;padding:5px 8px;margin-bottom:4px" oninput="document.getElementById('fl-sched-1').textContent=this.value">
+          <input class="field-input" type="text" value="9:00 AM" style="font-size:11px;padding:5px 8px" oninput="document.getElementById('fl-sched-time-1').textContent=this.value">
+        </div>
+        <div>
+          <label class="field-label" style="margin-bottom:4px;display:block">Step 2</label>
+          <input class="field-input" type="text" value="Activities" style="font-size:11px;padding:5px 8px;margin-bottom:4px" oninput="document.getElementById('fl-sched-2').textContent=this.value">
+          <input class="field-input" type="text" value="10:00 AM" style="font-size:11px;padding:5px 8px" oninput="document.getElementById('fl-sched-time-2').textContent=this.value">
+        </div>
+        <div>
+          <label class="field-label" style="margin-bottom:4px;display:block">Step 3</label>
+          <input class="field-input" type="text" value="Lunch" style="font-size:11px;padding:5px 8px;margin-bottom:4px" oninput="document.getElementById('fl-sched-3').textContent=this.value">
+          <input class="field-input" type="text" value="12:00 PM" style="font-size:11px;padding:5px 8px" oninput="document.getElementById('fl-sched-time-3').textContent=this.value">
+        </div>
+        <div>
+          <label class="field-label" style="margin-bottom:4px;display:block">Step 4</label>
+          <input class="field-input" type="text" value="Awards" style="font-size:11px;padding:5px 8px;margin-bottom:4px" oninput="document.getElementById('fl-sched-4').textContent=this.value">
+          <input class="field-input" type="text" value="4:00 PM" style="font-size:11px;padding:5px 8px" oninput="document.getElementById('fl-sched-time-4').textContent=this.value">
+        </div>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-section-header">Team Teaser</div>
+      <div class="field-group">
+        <label class="field-label">Headline</label>
+        <input class="field-input" type="text" value="Your country awaits…" oninput="document.getElementById('fl-team-headline').textContent=this.value">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Subtext</label>
+        <input class="field-input" type="text" value="Teams revealed at the retreat · 5–7 members per country" oninput="document.getElementById('fl-team-sub').textContent=this.value">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Flag Emojis</label>
+        <input class="field-input" type="text" value="🌍🌎🌏" oninput="document.querySelector('.flyer-team-flags').textContent=this.value">
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-section-header">RSVP Bar</div>
+      <div class="field-group">
+        <label class="field-label">Label</label>
+        <input class="field-input" type="text" value="RSVP by" oninput="document.getElementById('fl-rsvp-label').textContent=this.value">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Deadline</label>
+        <input class="field-input" type="text" value="TBD" oninput="document.getElementById('fl-rsvp-deadline').textContent=this.value">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Button Text</label>
+        <input class="field-input" type="text" value="RSVP Now →" oninput="document.getElementById('fl-rsvp-pill').textContent=this.value">
+      </div>
+      <div class="field-group">
+        <label class="field-label">RSVP QR Code</label>
+        <label class="upload-zone" style="padding:12px" onclick="triggerQrUpload('rsvp')" id="rsvp-panel-zone">
+          <div class="upload-icon" style="font-size:18px">📷</div>
+          <div class="upload-hint">Click to upload RSVP QR code</div>
+        </label>
+      </div>
+    </div>
+
+    <div class="panel-section">
+      <div class="panel-section-header">Food Truck QR Code</div>
+      <div class="field-group">
+        <label class="upload-zone" style="padding:12px" onclick="triggerQrUpload('foodtruck')" id="foodtruck-panel-zone">
+          <div class="upload-icon" style="font-size:18px">📷</div>
+          <div class="upload-hint">Click to upload Food Truck QR code</div>
+        </label>
+      </div>
+    </div>
+
+    <!-- LAYOUT TOGGLES -->
+    <div class="panel-section">
+      <div class="panel-section-header">Elements</div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Schedule Bar</span>
+        <div class="toggle on" id="tog-schedule" onclick="toggleEl('schedule',this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Team Teaser</span>
+        <div class="toggle on" id="tog-team" onclick="toggleEl('team',this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show RSVP Bar</span>
+        <div class="toggle on" id="tog-rsvp" onclick="toggleEl('rsvp',this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Stars</span>
+        <div class="toggle on" id="tog-stars" onclick="toggleEl('stars',this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Field Lines</span>
+        <div class="toggle" id="tog-field" onclick="toggleEl('field',this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Corner Accents</span>
+        <div class="toggle on" id="tog-corners" onclick="toggleEl('corners',this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show Trophy</span>
+        <div class="toggle on" id="tog-trophy" onclick="toggleEl('trophy',this)"></div>
+      </div>
+      <div class="field-group" style="margin-top:10px">
+        <label class="field-label">Trophy Size</label>
+        <div class="range-wrap">
+          <input type="range" id="range-trophysize" min="60" max="220" value="120" oninput="applyTrophySize(this.value)">
+          <span class="range-val" id="val-trophysize">120</span>
+        </div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Trophy Base Text</label>
+        <input class="field-input" type="text" id="txt-trophytext" value="CHOICE" oninput="applyTrophyText(this.value)">
+      </div>
+      <div class="field-group">
+        <label class="field-label">Trophy Icon</label>
+        <select class="font-select" id="sel-trophystars" onchange="applyTrophyStars(this.value)">
+          <option value="★★★">★★★ (3 stars)</option>
+          <option value="★★★★★">★★★★★ (5 stars)</option>
+          <option value="⚽⚽⚽">⚽⚽⚽ (balls)</option>
+          <option value="🏆">🏆 (trophy emoji)</option>
+          <option value="">— none —</option>
+        </select>
+      </div>
+      <div class="color-row" style="margin-bottom:12px">
+        <div class="color-field">
+          <label class="field-label">Trophy Light</label>
+          <div class="color-preview-wrap" onclick="openColor('trophytop')">
+            <div class="color-swatch" id="swatch-trophytop" style="background:#dfc8ff"></div>
+            <span class="color-hex" id="hex-trophytop">#dfc8ff</span>
+          </div>
+          <input type="color" id="color-trophytop" value="#dfc8ff" oninput="applyColor('trophytop',this.value)">
+        </div>
+        <div class="color-field">
+          <label class="field-label">Trophy Dark</label>
+          <div class="color-preview-wrap" onclick="openColor('trophybot')">
+            <div class="color-swatch" id="swatch-trophybot" style="background:#4b2e83"></div>
+            <span class="color-hex" id="hex-trophybot">#4b2e83</span>
+          </div>
+          <input type="color" id="color-trophybot" value="#4b2e83" oninput="applyColor('trophybot',this.value)">
+        </div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Show QR Section</span>
+        <div class="toggle on" id="tog-qr" onclick="toggleEl('qr',this)"></div>
+      </div>
+      <div class="toggle-row">
+        <span class="toggle-label">Trophy Float Animation</span>
+        <div class="toggle on" id="tog-anim" onclick="toggleEl('anim',this)"></div>
+      </div>
+    </div>
+
+  </div><!-- end panel -->
+
+  <!-- CANVAS -->
+  <div class="canvas-area" id="canvas">
+
+    <!-- FLYER -->
+    <div id="flyer" style="transform: scale(0.7); background: rgb(26, 10, 46);">
+      <div class="flyer-bg" id="flyer-bg" style="background: radial-gradient(80% 60% at 50% -10%, rgba(155, 109, 255, 0.35) 0%, transparent 70%), rgb(26, 10, 46);"></div>
+      <div id="flyer-bg-img"></div>
+      <div id="flyer-bg-overlay"></div>
+
+      <!-- Field -->
+      <div class="flyer-field" id="flyer-field" style="display: none; background: linear-gradient(to top, rgba(6, 0, 26, 0.95), transparent);">
+        <svg style="position:absolute;bottom:0;left:0;right:0;width:100%;height:100%;opacity:0.13" viewBox="0 0 600 220" preserveAspectRatio="none">
+          <line x1="0" y1="160" x2="600" y2="160" stroke="white" stroke-width="1.5"></line>
+          <ellipse cx="300" cy="160" rx="90" ry="60" fill="none" stroke="white" stroke-width="1.5"></ellipse>
+          <line x1="300" y1="100" x2="300" y2="160" stroke="white" stroke-width="1"></line>
+          <rect x="220" y="130" width="160" height="30" fill="none" stroke="white" stroke-width="1.2"></rect>
+          <rect x="260" y="148" width="80" height="12" fill="none" stroke="white" stroke-width="1"></rect>
+        </svg>
+      </div>
+
+      <!-- Corners -->
+      <div id="flyer-corners">
+        <div class="flyer-corner tl" id="corner-tl" style="border-color: rgba(155, 109, 255, 0.5);"></div>
+        <div class="flyer-corner tr" id="corner-tr" style="border-color: rgba(155, 109, 255, 0.5);"></div>
+        <div class="flyer-corner bl" id="corner-bl" style="border-color: rgba(155, 109, 255, 0.5);"></div>
+        <div class="flyer-corner br" id="corner-br" style="border-color: rgba(155, 109, 255, 0.5);"></div>
+      </div>
+
+      <!-- Stars -->
+      <div id="flyer-stars" class="flyer-stars">
+        <span style="top: 7%; left: 12%; animation-delay: 0s; background: rgb(155, 109, 255);"></span>
+        <span style="top: 4%; left: 70%; animation-delay: 0.7s; background: rgb(155, 109, 255);"></span>
+        <span style="top: 12%; left: 88%; animation-delay: 1.2s; background: rgb(155, 109, 255);"></span>
+        <span style="top: 20%; left: 4%; animation-delay: 0.4s; background: rgb(155, 109, 255);"></span>
+        <span style="top: 35%; left: 93%; animation-delay: 1.8s; width: 2px; height: 2px; background: rgb(155, 109, 255);"></span>
+        <span style="top: 55%; left: 3%; animation-delay: 0.9s; width: 2px; height: 2px; background: rgb(155, 109, 255);"></span>
+      </div>
+
+      <!-- Content -->
+      <div class="flyer-content">
+        <div class="flyer-header">
+          <div class="flyer-presents" id="fl-presents" style="color: rgb(255, 255, 255);">University of Washington School of Pharmacy</div>
+          <div class="flyer-program-badge" id="fl-badge" contenteditable="true" spellcheck="false" style="background: rgb(125, 79, 225); color: rgb(255, 255, 255);">⚕ CHOICE Institute</div>
+        </div>
+
+        <div class="flyer-title-block">
+          <div class="flyer-eyebrow" id="fl-eyebrow" contenteditable="true" spellcheck="false" style="color: rgb(255, 255, 255);">Annual Retreat</div>
+          <div class="flyer-title-main" id="fl-title" contenteditable="true" spellcheck="false" style="color: rgb(255, 255, 255);">CHOICE CUP</div>
+          <div class="flyer-title-sub" id="fl-year" contenteditable="true" spellcheck="false" style="color: rgb(196, 160, 232);">2026</div>
+        </div>
+
+        <div class="flyer-divider">
+          <div class="flyer-divider-line" id="fl-div-line" style="background: linear-gradient(to right, transparent, rgba(155, 109, 255, 0.5), transparent);"></div>
+          <div class="flyer-divider-diamond" id="fl-div-diamond" style="background: rgb(155, 109, 255);"></div>
+          <div class="flyer-divider-line" id="fl-div-line2" style="background: linear-gradient(to right, transparent, rgba(155, 109, 255, 0.5), transparent);"></div>
+        </div>
+
+        <!-- Trophy -->
+        <div class="flyer-trophy-area" id="flyer-trophy-area">
+          <div class="flyer-trophy-glow" id="fl-trophy-glow" style="background: radial-gradient(circle, rgba(155, 109, 255, 0.3) 0%, transparent 70%);"></div>
+          <svg class="trophy-svg-el" id="fl-trophy-svg" width="120" height="168" viewBox="0 0 140 190" fill="none">
+            <defs>
+              <linearGradient id="tg1" x1="0" y1="0" x2="1" y2="1">
+                <stop offset="0%" stop-color="#dfc8ff"></stop>
+                <stop offset="40%" stop-color="#a855f7"></stop>
+                <stop offset="100%" stop-color="#7c3aed"></stop>
+              </linearGradient>
+              <linearGradient id="tg2" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#9b6dff"></stop>
+                <stop offset="100%" stop-color="#4b2e83"></stop>
+              </linearGradient>
+              <linearGradient id="tg3" x1="0" y1="0" x2="1" y2="0">
+                <stop offset="0%" stop-color="rgba(255,255,255,0)"></stop>
+                <stop offset="40%" stop-color="rgba(255,255,255,0.3)"></stop>
+                <stop offset="100%" stop-color="rgba(255,255,255,0)"></stop>
+              </linearGradient>
+            </defs>
+            <path d="M35 45 Q10 45 10 75 Q10 100 35 100" stroke="url(#tg1)" stroke-width="7" fill="none" stroke-linecap="round"></path>
+            <path d="M105 45 Q130 45 130 75 Q130 100 105 100" stroke="url(#tg1)" stroke-width="7" fill="none" stroke-linecap="round"></path>
+            <path d="M35 20 L105 20 L95 110 Q70 125 45 110 Z" fill="url(#tg1)"></path>
+            <path d="M42 20 L68 20 L60 108 Q52 113 45 110 Z" fill="url(#tg3)" opacity="0.5"></path>
+            <rect x="28" y="16" width="84" height="12" rx="6" fill="url(#tg1)"></rect>
+            <text x="70" y="58" text-anchor="middle" font-size="16" fill="rgba(255,255,255,0.3)">★★★</text>
+            <rect x="59" y="110" width="22" height="30" rx="2" fill="url(#tg2)"></rect>
+            <rect x="63" y="110" width="14" height="30" rx="1" fill="url(#tg1)"></rect>
+            <rect x="36" y="140" width="68" height="14" rx="4" fill="url(#tg1)"></rect>
+            <rect x="28" y="152" width="84" height="10" rx="5" fill="url(#tg2)"></rect>
+            <rect x="36" y="154" width="68" height="4" rx="2" fill="rgba(255,255,255,0.15)"></rect>
+            <text x="70" y="149" text-anchor="middle" font-family="'Bebas Neue'" font-size="9" fill="rgba(60,20,100,0.9)" letter-spacing="2">CHOICE</text>
+          </svg>
+        </div>
+
+        <div class="flyer-info-row">
+          <div class="flyer-info-card">
+            <div class="flyer-info-label" id="fl-date-label" style="color: rgb(155, 109, 255);">📅 Date</div>
+            <div class="flyer-info-val" id="fl-date" contenteditable="true" spellcheck="false">TBD 2026</div>
+          </div>
+          <div class="flyer-info-card">
+            <div class="flyer-info-label" id="fl-loc-label" style="color: rgb(155, 109, 255);">📍 Location</div>
+            <div class="flyer-info-val" id="fl-location" contenteditable="true" spellcheck="false">UW Campus</div>
+          </div>
+          <div class="flyer-info-card">
+            <div class="flyer-info-label" id="fl-fmt-label" style="color: rgb(155, 109, 255);">🎯 Format</div>
+            <div class="flyer-info-val" id="fl-format" contenteditable="true" spellcheck="false">Full Day</div>
+          </div>
+        </div>
+
+        <div class="flyer-tagline" id="fl-tagline" style="color: rgb(255, 255, 255);">
+          Compete · Collaborate · Celebrate<br>
+          <em id="fl-highlight" style="color: rgb(196, 160, 232);">One retreat. Many champions.</em>
+        </div>
+
+        <!-- Schedule teaser -->
+        <div class="flyer-schedule-bar" id="flyer-schedule-bar" style="border-color: rgba(155, 109, 255, 0.15);">
+          <div class="flyer-schedule-step">
+            <span class="flyer-schedule-icon">☀️</span>
+            <span class="flyer-schedule-label" id="fl-sched-1">Morning</span>
+            <span class="flyer-schedule-time" id="fl-sched-time-1">9:00 AM</span>
+          </div>
+          <div class="flyer-schedule-step">
+            <span class="flyer-schedule-icon">⚽</span>
+            <span class="flyer-schedule-label" id="fl-sched-2">Activities</span>
+            <span class="flyer-schedule-time" id="fl-sched-time-2">10:00 AM</span>
+          </div>
+          <div class="flyer-schedule-step">
+            <span class="flyer-schedule-icon">🍽</span>
+            <span class="flyer-schedule-label" id="fl-sched-3">Lunch</span>
+            <span class="flyer-schedule-time" id="fl-sched-time-3">12:00 PM</span>
+          </div>
+          <div class="flyer-schedule-step">
+            <span class="flyer-schedule-icon">🏆</span>
+            <span class="flyer-schedule-label" id="fl-sched-4">Awards</span>
+            <span class="flyer-schedule-time" id="fl-sched-time-4">4:00 PM</span>
+          </div>
+        </div>
+
+        <!-- Team teaser -->
+        <div class="flyer-team-teaser" id="flyer-team-teaser" style="border-color: rgba(155, 109, 255, 0.3);">
+          <div class="flyer-team-flags">🌍🌎🌏</div>
+          <div class="flyer-team-text">
+            <div class="flyer-team-headline" id="fl-team-headline">Your country awaits…</div>
+            <div class="flyer-team-sub" id="fl-team-sub">Teams revealed at the retreat · 5–7 members per country</div>
+          </div>
+        </div>
+
+        <!-- RSVP -->
+        <div class="flyer-rsvp-bar" id="flyer-rsvp-bar">
+          <div class="flyer-rsvp-left">
+            <div class="flyer-qr-upload-slot" id="rsvp-qr-slot" onclick="triggerQrUpload('rsvp')" title="Click to upload RSVP QR code">
+              <div class="qr-slot-inner" id="rsvp-qr-inner">
+                <span class="qr-slot-icon">📷</span>
+                <span class="qr-slot-hint">Upload QR</span>
+              </div>
+            </div>
+            <div class="flyer-rsvp-text">
+              <div class="flyer-rsvp-label" id="fl-rsvp-label" style="color: rgb(155, 109, 255);">RSVP by</div>
+              <div class="flyer-rsvp-deadline" id="fl-rsvp-deadline" contenteditable="true" spellcheck="false">TBD</div>
+            </div>
+          </div>
+          <div class="flyer-rsvp-pill" id="fl-rsvp-pill" style="background: rgb(155, 109, 255);">RSVP Now →</div>
+        </div>
+
+        <!-- QR -->
+        <div class="flyer-qr-row" id="flyer-qr-row" style="background: rgba(155, 109, 255, 0.08); border-color: rgba(155, 109, 255, 0.2);">
+          <div class="flyer-qr-box" id="foodtruck-qr-slot" onclick="triggerQrUpload('foodtruck')" title="Click to upload Food Truck QR code" style="cursor:pointer;position:relative;overflow:hidden;">
+            <div class="qr-slot-inner" id="foodtruck-qr-inner" style="width:100%;height:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;">
+              <span class="qr-slot-icon" style="font-size:18px">📷</span>
+              <span class="qr-slot-hint" style="font-size:8px;color:#888;text-align:center;font-family:sans-serif;letter-spacing:0.5px">Upload QR</span>
+            </div>
+          </div>
+          <div class="flyer-qr-text">
+            <div class="flyer-qr-eyebrow" id="fl-qr-eyebrow" style="color: rgb(155, 109, 255);">🗳 Cast Your Vote</div>
+            <div class="flyer-qr-headline" id="fl-qr-cta" contenteditable="true" spellcheck="false">Vote for Food Truck</div>
+            <div class="flyer-qr-desc">Venezuelan · Mexican · Mediterranean · Thai</div>
+          </div>
+        </div>
+
+      </div><!-- end flyer-content -->
+
+      <div class="flyer-footer">
+        <div class="flyer-footer-l">CHOICE Institute · UW School of Pharmacy</div>
+        <div class="flyer-footer-r">sop.washington.edu/choice</div>
+      </div>
+    </div><!-- end #flyer -->
+
+    <!-- Zoom controls -->
+    <div class="zoom-controls">
+      <button class="zoom-btn" onclick="changeZoom(-0.1)">−</button>
+      <div class="zoom-label" id="zoom-label">70%</div>
+      <button class="zoom-btn" onclick="changeZoom(0.1)">+</button>
+      <button class="zoom-btn" title="Fit" onclick="fitZoom()">⊡</button>
+    </div>
+  </div>
+
+</div><!-- end workspace -->
+
+<div class="toast" id="toast">Flyer HTML copied to clipboard!</div>
+
+<!-- SAVE MODAL -->
+<div class="modal-backdrop open" id="saveModal" onclick="closeSaveModalOutside(event)">
+  <div class="modal">
+    <button class="modal-close" onclick="closeSaveModal()">✕</button>
+    <div class="modal-title">💾 Save My Version</div>
+    <div class="modal-sub">Export your customized flyer. All your edits, colors, uploaded images, and text are baked in — ready to share or print.</div>
+
+    <div class="modal-field">
+      <label class="modal-label">File Name</label>
+      <input class="modal-input" id="save-filename" type="text" value="CHOICE_CUP_2026_Flyer" placeholder="e.g. retreat_flyer_v2">
+    </div>
+
+    <div class="modal-divider"></div>
+
+    <div style="font-family:'Barlow Condensed';font-size:10px;letter-spacing:2.5px;color:rgba(155,109,255,0.8);text-transform:uppercase;margin-bottom:12px">Export Format</div>
+    <div class="modal-options">
+      <div class="modal-option" id="opt-html" onclick="selectSaveOpt('html')">
+        <div class="modal-option-icon">🌐</div>
+        <div class="modal-option-title">HTML File</div>
+        <div class="modal-option-desc">Open in any browser. Images embedded. Perfect for sharing.</div>
+      </div>
+      <div class="modal-option selected" id="opt-editor" onclick="selectSaveOpt('editor')">
+        <div class="modal-option-icon">✏️</div>
+        <div class="modal-option-title">Editable Version</div>
+        <div class="modal-option-desc">Full editor included so others can keep customizing.</div>
+      </div>
+    </div>
+
+    <div class="modal-actions">
+      <button class="modal-btn modal-btn-secondary" onclick="closeSaveModal()">Cancel</button>
+      <button class="modal-btn modal-btn-primary" onclick="executeSave()">↓ Download Now</button>
+    </div>
+    <div class="modal-progress" id="save-progress" style="display: block;">
+      <div class="modal-progress-bar" id="save-progress-bar" style="width: 20%;"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+// ===== STATE =====
+let zoom = 0.75;
+let colors = {
+  bg: '#1a0a2e', accent: '#9b6dff', titlec: '#ffffff', highlight: '#c4a0e8'
+};
+
+const presets = {
+  uw:       { bg:'#1a0a2e', accent:'#9b6dff', titlec:'#ffffff', highlight:'#c4a0e8', field:'rgba(8,20,40,0.9)' },
+  midnight: { bg:'#080818', accent:'#4f9fff', titlec:'#e0f0ff', highlight:'#90c8ff', field:'rgba(4,10,30,0.9)' },
+  forest:   { bg:'#062010', accent:'#40c060', titlec:'#e0ffe8', highlight:'#90e8a0', field:'rgba(4,24,10,0.9)' },
+  gold:     { bg:'#1a1200', accent:'#e8b830', titlec:'#fff8e0', highlight:'#f0d070', field:'rgba(20,14,0,0.9)' },
+  crimson:  { bg:'#1e0608', accent:'#e83040', titlec:'#ffe0e2', highlight:'#f090a0', field:'rgba(20,4,6,0.9)' },
+  ocean:    { bg:'#041828', accent:'#20d0c8', titlec:'#e0faff', highlight:'#80e8e4', field:'rgba(2,14,24,0.9)' }
+};
+
+// ===== ZOOM =====
+function changeZoom(delta) {
+  zoom = Math.max(0.3, Math.min(1.4, zoom + delta));
+  applyZoom();
+}
+function fitZoom() {
+  const canvas = document.getElementById('canvas');
+  const flyer = document.getElementById('flyer');
+  const ratio = Math.min((canvas.clientWidth - 80) / 600, (canvas.clientHeight - 80) / 820);
+  zoom = Math.round(ratio * 10) / 10;
+  applyZoom();
+}
+function applyZoom() {
+  document.getElementById('flyer').style.transform = `scale(${zoom})`;
+  document.getElementById('zoom-label').textContent = Math.round(zoom * 100) + '%';
+}
+applyZoom();
+
+// ===== SYNC text inputs → flyer (for non-contenteditable) =====
+function sync(field, val) {
+  const map = {
+    badge: 'fl-badge', eyebrow: 'fl-eyebrow', title: 'fl-title',
+    year: 'fl-year', tagline: null, highlight: null,
+    date: 'fl-date', location: 'fl-location', format: 'fl-format',
+    qrcta: 'fl-qr-cta'
+  };
+  if (field === 'tagline') {
+    const el = document.getElementById('fl-tagline');
+    const hi = document.getElementById('fl-highlight');
+    el.childNodes[0].textContent = val + '\n';
+    return;
+  }
+  if (field === 'highlight') {
+    document.getElementById('fl-highlight').textContent = val;
+    return;
+  }
+  if (map[field]) {
+    document.getElementById(map[field]).textContent = val;
+  }
+}
+
+// Keep inputs in sync with direct edits on flyer
+['fl-badge','fl-eyebrow','fl-title','fl-year','fl-date','fl-location','fl-format','fl-qr-cta'].forEach(id => {
+  const el = document.getElementById(id);
+  const inputMap = {
+    'fl-badge':'txt-badge','fl-eyebrow':'txt-eyebrow','fl-title':'txt-title',
+    'fl-year':'txt-year','fl-date':'txt-date','fl-location':'txt-location',
+    'fl-format':'txt-format','fl-qr-cta':'txt-qr-cta'
+  };
+  el.addEventListener('input', () => {
+    const inp = document.getElementById(inputMap[id]);
+    if(inp) inp.value = el.textContent;
+  });
+});
+
+// ===== COLORS =====
+function openColor(key) {
+  const inp = document.getElementById('color-' + key);
+  inp.style.pointerEvents = 'auto';
+  inp.click();
+  setTimeout(() => inp.style.pointerEvents = 'none', 100);
+}
+
+function applyColor(key, val) {
+  colors[key] = val;
+  document.getElementById('swatch-' + key).style.background = val;
+  document.getElementById('hex-' + key).textContent = val;
+  document.getElementById('color-' + key).value = val;
+  if (key === 'cardval') {
+    document.querySelectorAll('.flyer-info-val').forEach(el => el.style.color = val);
+    return;
+  }
+  if (key === 'cardbg') {
+    document.querySelectorAll('.flyer-info-card').forEach(el => el.style.background = hexToRgba(val, 0.4));
+    return;
+  }
+  if (key === 'trophytop' || key === 'trophybot') {
+    colors[key] = val;
+    applyTrophyColors(colors.trophytop || '#dfc8ff', colors.trophybot || '#4b2e83');
+    return;
+  }
+  renderColors();
+  // deactivate preset chips
+  document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+}
+
+function renderColors() {
+  const { bg, accent, titlec, highlight } = colors;
+
+  // Background
+  document.getElementById('flyer-bg').style.background =
+    `radial-gradient(ellipse 80% 60% at 50% -10%, ${hexToRgba(accent,0.35)} 0%, transparent 70%), ${bg}`;
+  document.getElementById('flyer').style.background = bg;
+
+  // Accent elements
+  document.querySelectorAll('.flyer-corner').forEach(c => c.style.borderColor = hexToRgba(accent, 0.5));
+  document.querySelectorAll('#flyer-stars span').forEach(s => s.style.background = accent);
+  document.getElementById('fl-div-line').style.background = `linear-gradient(to right, transparent, ${hexToRgba(accent,0.5)}, transparent)`;
+  document.getElementById('fl-div-line2').style.background = `linear-gradient(to right, transparent, ${hexToRgba(accent,0.5)}, transparent)`;
+  document.getElementById('fl-div-diamond').style.background = accent;
+  document.getElementById('fl-trophy-glow').style.background = `radial-gradient(circle, ${hexToRgba(accent,0.3)} 0%, transparent 70%)`;
+  document.getElementById('fl-badge').style.background = shadeColor(accent, -30);
+  document.getElementById('fl-qr-eyebrow').style.color = accent;
+  document.getElementById('fl-rsvp-label').style.color = accent;
+  document.getElementById('fl-rsvp-pill').style.background = accent;
+  document.querySelector('.flyer-team-teaser').style.borderColor = hexToRgba(accent, 0.3);
+  document.querySelector('.flyer-schedule-bar').style.borderColor = hexToRgba(accent, 0.15);
+  document.getElementById('flyer-qr-row').style.background = hexToRgba(accent, 0.08);
+  document.getElementById('flyer-qr-row').style.borderColor = hexToRgba(accent, 0.2);
+  document.querySelectorAll('.flyer-info-label').forEach(l => l.style.color = accent);
+
+  // Title / text
+  document.getElementById('fl-title').style.color = titlec;
+  document.getElementById('fl-eyebrow').style.color = titlec;
+  document.getElementById('fl-year').style.color = highlight;
+  document.getElementById('fl-highlight').style.color = highlight;
+  document.getElementById('fl-tagline').style.color = titlec;
+  document.getElementById('fl-presents').style.color = titlec;
+  document.getElementById('fl-badge').style.color = titlec;
+
+  // Field tint
+  document.getElementById('flyer-field').style.background =
+    `linear-gradient(to top, ${hexToRgba(shadeColor(bg,-20),0.95)}, transparent)`;
+}
+
+function applyPreset(name) {
+  const p = presets[name];
+  colors = { bg: p.bg, accent: p.accent, titlec: p.titlec, highlight: p.highlight };
+  ['bg','accent','titlec','highlight'].forEach(k => {
+    document.getElementById('swatch-'+k).style.background = colors[k];
+    document.getElementById('hex-'+k).textContent = colors[k];
+    document.getElementById('color-'+k).value = colors[k];
+  });
+  document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+  document.getElementById('preset-'+name).classList.add('active');
+  renderColors();
+  showToast('Theme applied: ' + name.charAt(0).toUpperCase() + name.slice(1));
+}
+
+// ===== FONT =====
+function applyFont(key, val) {
+  if (key === 'title') {
+    document.getElementById('fl-title').style.fontFamily = val;
+    document.getElementById('fl-eyebrow').style.fontFamily = val;
+    document.getElementById('fl-year').style.fontFamily = val;
+  }
+}
+
+// ===== TITLE SIZE =====
+function applyTitleSize(val) {
+  document.getElementById('fl-title').style.fontSize = val + 'px';
+  document.getElementById('val-titlesize').textContent = val;
+}
+
+function applySubSize(val) {
+  document.getElementById('fl-year').style.fontSize = val + 'px';
+  document.getElementById('val-subsize').textContent = val;
+}
+
+// ===== TROPHY CONTROLS =====
+function applyTrophySize(val) {
+  const svg = document.getElementById('fl-trophy-svg');
+  const ratio = val / 120;
+  svg.setAttribute('width', val);
+  svg.setAttribute('height', Math.round(168 * ratio));
+  document.getElementById('val-trophysize').textContent = val;
+  // scale the glow too
+  const glow = document.getElementById('fl-trophy-glow');
+  const glowSize = Math.round(val * 1.35);
+  glow.style.width = glowSize + 'px';
+  glow.style.height = glowSize + 'px';
+}
+
+function applyTrophyText(val) {
+  const el = document.querySelector('#fl-trophy-svg text:last-of-type');
+  if (el) el.textContent = val;
+}
+
+function applyTrophyStars(val) {
+  const els = document.querySelectorAll('#fl-trophy-svg text');
+  // first text element is the stars/icon (not the last one which is base text)
+  if (els.length >= 2) els[0].textContent = val;
+}
+
+function applyTrophyColors(top, bot) {
+  const svg = document.getElementById('fl-trophy-svg');
+  // Update gradient stops
+  const stops1 = svg.querySelectorAll('#tg1 stop');
+  const stops2 = svg.querySelectorAll('#tg2 stop');
+  if (stops1.length >= 3) {
+    stops1[0].setAttribute('stop-color', top);
+    stops1[1].setAttribute('stop-color', blendColors(top, bot, 0.5));
+    stops1[2].setAttribute('stop-color', bot);
+  }
+  if (stops2.length >= 2) {
+    stops2[0].setAttribute('stop-color', blendColors(top, bot, 0.3));
+    stops2[1].setAttribute('stop-color', bot);
+  }
+  // Also update glow color
+  document.getElementById('fl-trophy-glow').style.background =
+    `radial-gradient(circle, ${hexToRgba(top, 0.3)} 0%, transparent 70%)`;
+}
+
+// ===== EVENT CARD CONTROLS =====
+function applyCardLabel(key, val) {
+  const map = { date: 'fl-date-label', loc: 'fl-loc-label', fmt: 'fl-fmt-label' };
+  if (map[key]) document.getElementById(map[key]).textContent = val;
+}
+
+function applyCardValSize(val) {
+  document.querySelectorAll('.flyer-info-val').forEach(el => el.style.fontSize = val + 'px');
+  document.getElementById('val-cardvalsize').textContent = val;
+}
+
+function applyCardLblSize(val) {
+  document.querySelectorAll('.flyer-info-label').forEach(el => el.style.fontSize = val + 'px');
+  document.getElementById('val-cardlblsize').textContent = val;
+}
+
+function blendColors(hex1, hex2, t) {
+  const r1=parseInt(hex1.slice(1,3),16), g1=parseInt(hex1.slice(3,5),16), b1=parseInt(hex1.slice(5,7),16);
+  const r2=parseInt(hex2.slice(1,3),16), g2=parseInt(hex2.slice(3,5),16), b2=parseInt(hex2.slice(5,7),16);
+  const r=Math.round(r1+(r2-r1)*t), g=Math.round(g1+(g2-g1)*t), b=Math.round(b1+(b2-b1)*t);
+  return '#'+[r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+// ===== TOGGLE ELEMENTS =====
+function toggleEl(el, btn) {
+  btn.classList.toggle('on');
+  const on = btn.classList.contains('on');
+  const map = {
+    stars: 'flyer-stars',
+    field: 'flyer-field',
+    corners: 'flyer-corners',
+    trophy: 'flyer-trophy-area',
+    qr: 'flyer-qr-row',
+    schedule: 'flyer-schedule-bar',
+    team: 'flyer-team-teaser',
+    rsvp: 'flyer-rsvp-bar',
+  };
+  if (el === 'anim') {
+    const svg = document.getElementById('fl-trophy-svg');
+    svg.style.animationPlayState = on ? 'running' : 'paused';
+    return;
+  }
+  if (map[el]) {
+    document.getElementById(map[el]).style.display = on ? '' : 'none';
+  }
+}
+
+// ===== DOWNLOAD =====
+function openSaveModal() {
+  document.getElementById('saveModal').classList.add('open');
+}
+function closeSaveModal() {
+  document.getElementById('saveModal').classList.remove('open');
+}
+function closeSaveModalOutside(e) {
+  if (e.target === document.getElementById('saveModal')) closeSaveModal();
+}
+
+let saveOpt = 'html';
+function selectSaveOpt(opt) {
+  saveOpt = opt;
+  document.querySelectorAll('.modal-option').forEach(o => o.classList.remove('selected'));
+  document.getElementById('opt-' + opt).classList.add('selected');
+}
+
+function executeSave() {
+  const progress = document.getElementById('save-progress');
+  const bar = document.getElementById('save-progress-bar');
+  progress.style.display = 'block';
+  bar.style.width = '20%';
+
+  const filename = (document.getElementById('save-filename').value || 'CHOICE_CUP_Flyer').replace(/[^a-zA-Z0-9_-]/g,'_');
+
+  setTimeout(() => { bar.style.width = '60%'; }, 200);
+
+  // Grab flyer outerHTML with all inline styles (images already base64)
+  const flyer = document.getElementById('flyer');
+  const prevT = flyer.style.transform;
+  flyer.style.transform = 'none';
+  const flyerHTML = flyer.outerHTML;
+  flyer.style.transform = prevT;
+
+  // Collect all the flyer CSS from the page
+  const allCSS = Array.from(document.styleSheets)
+    .flatMap(s => { try { return Array.from(s.cssRules).map(r => r.cssText); } catch(e) { return []; } })
+    .join('\n');
+
+  // Animation keyframes needed for the static flyer
+  const keyframes = `
+@keyframes tfloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)}}
+@keyframes pglow{from{transform:translate(-50%,-50%) scale(0.9);opacity:0.5}to{transform:translate(-50%,-50%) scale(1.1);opacity:1}}
+@keyframes twinkle{from{opacity:0.2}to{opacity:1}}`;
+
+  setTimeout(() => { bar.style.width = '85%'; }, 400);
+
+  let html;
+  if (saveOpt === 'html') {
+    // Clean static flyer only — no editor chrome
+    html = `<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CHOICE CUP 2026 — Flyer</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Oswald:wght@300;400;600;700&family=Barlow+Condensed:wght@300;400;600;700&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:#0a0910;display:flex;justify-content:center;align-items:center;min-height:100vh;padding:40px}
+${keyframes}
+.flyer-bg,.flyer-bg-img,#flyer-bg-img,#flyer-bg-overlay{position:absolute;inset:0;pointer-events:none}
+#flyer-bg-img{background-size:cover;background-position:center;background-repeat:no-repeat}
+/* Schedule bar */
+.flyer-schedule-bar{display:flex;width:82%;margin:8px 0;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,0.08)}
+.flyer-schedule-step{flex:1;padding:7px 4px;text-align:center;background:rgba(0,0,0,0.25);border-right:1px solid rgba(255,255,255,0.06);position:relative}
+.flyer-schedule-step:last-child{border-right:none}
+.flyer-schedule-step::after{content:'›';position:absolute;right:-7px;top:50%;transform:translateY(-50%);font-size:10px;color:rgba(255,255,255,0.2);z-index:2}
+.flyer-schedule-step:last-child::after{display:none}
+.flyer-schedule-icon{font-size:13px;display:block;margin-bottom:2px}
+.flyer-schedule-label{font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.5);line-height:1.2}
+.flyer-schedule-time{font-family:'Bebas Neue',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);display:block;margin-top:1px}
+/* Team teaser */
+.flyer-team-teaser{width:82%;margin:6px 0;border-radius:4px;padding:10px 14px;background:rgba(0,0,0,0.2);border:1px dashed rgba(255,255,255,0.12);display:flex;align-items:center;gap:10px}
+.flyer-team-flags{font-size:16px;letter-spacing:2px;flex-shrink:0}
+.flyer-team-headline{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:white;line-height:1}
+.flyer-team-sub{font-family:'Barlow',sans-serif;font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px;line-height:1.4}
+/* RSVP */
+.flyer-rsvp-bar{width:82%;margin:6px 0;border-radius:4px;padding:9px 14px;display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid rgba(255,255,255,0.1);background:rgba(0,0,0,0.2)}
+.flyer-rsvp-left{display:flex;align-items:center;gap:8px}
+.flyer-rsvp-label{font-family:'Barlow Condensed',sans-serif;font-size:8px;letter-spacing:2.5px;text-transform:uppercase;margin-bottom:2px}
+.flyer-rsvp-deadline{font-family:'Bebas Neue',sans-serif;font-size:15px;color:white;letter-spacing:1px;line-height:1}
+.flyer-rsvp-pill{font-family:'Barlow Condensed',sans-serif;font-size:10px;letter-spacing:2px;color:white;text-transform:uppercase;padding:4px 12px;border-radius:20px;white-space:nowrap;flex-shrink:0}
+/* QR slots */
+.flyer-qr-upload-slot{width:52px;height:52px;background:rgba(255,255,255,0.06);border:1.5px dashed rgba(255,255,255,0.2);border-radius:4px;display:flex;align-items:center;justify-content:center;overflow:hidden;position:relative}
+.qr-uploaded-img{width:100%;height:100%;object-fit:cover;border-radius:3px;display:block}
+</style>
+</head>
+<body>
+${flyerHTML}
+</body></html>`;
+  } else {
+    // Full editor version — just the current page with all state baked in
+    html = document.documentElement.outerHTML;
+  }
+
+  setTimeout(() => {
+    bar.style.width = '100%';
+    setTimeout(() => {
+      const blob = new Blob([html], {type:'text/html'});
+      const a = document.createElement('a');
+      a.href = URL.createObjectURL(blob);
+      a.download = filename + '.html';
+      a.click();
+      progress.style.display = 'none';
+      bar.style.width = '0%';
+      closeSaveModal();
+      showToast('✓ Saved as ' + filename + '.html');
+    }, 300);
+  }, 600);
+}
+
+
+function copyHTML() {
+  const flyer = document.getElementById('flyer');
+  const prevTransform = flyer.style.transform;
+  flyer.style.transform = 'none';
+  navigator.clipboard.writeText(flyer.outerHTML).then(() => {
+    showToast('Flyer HTML copied to clipboard!');
+  });
+  flyer.style.transform = prevTransform;
+}
+
+// ===== RESET =====
+function resetDefaults() {
+  applyPreset('uw');
+  document.getElementById('txt-title').value = 'CHOICE CUP';
+  document.getElementById('txt-eyebrow').value = 'Annual Retreat';
+  document.getElementById('txt-year').value = '2026';
+  document.getElementById('txt-badge').value = '⚕ CHOICE Institute';
+  document.getElementById('txt-tagline').value = 'Compete · Collaborate · Celebrate';
+  document.getElementById('txt-highlight').value = 'One retreat. Many champions.';
+  document.getElementById('txt-date').value = 'TBD 2026';
+  document.getElementById('txt-location').value = 'UW Campus';
+  document.getElementById('txt-format').value = 'Full Day';
+  ['fl-badge','fl-eyebrow','fl-title','fl-year','fl-date','fl-location','fl-format'].forEach(id => {
+    const defaults = {
+      'fl-badge':'⚕ CHOICE Institute','fl-eyebrow':'Annual Retreat','fl-title':'CHOICE CUP',
+      'fl-year':'2026','fl-date':'TBD 2026','fl-location':'UW Campus','fl-format':'Full Day'
+    };
+    document.getElementById(id).textContent = defaults[id];
+  });
+  document.getElementById('fl-highlight').textContent = 'One retreat. Many champions.';
+  document.getElementById('range-titlesize').value = 100;
+  document.getElementById('val-titlesize').textContent = 100;
+  document.getElementById('fl-title').style.fontSize = '100px';
+  document.getElementById('range-subsize').value = 28;
+  document.getElementById('val-subsize').textContent = 28;
+  document.getElementById('fl-year').style.fontSize = '28px';
+  document.getElementById('range-trophysize').value = 120;
+  document.getElementById('val-trophysize').textContent = 120;
+  applyTrophySize(120);
+  document.getElementById('txt-trophytext').value = 'CHOICE';
+  applyTrophyText('CHOICE');
+  document.getElementById('sel-trophystars').value = '★★★';
+  applyTrophyStars('★★★');
+  colors.trophytop = '#dfc8ff'; colors.trophybot = '#4b2e83';
+  ['trophytop','trophybot'].forEach(k => {
+    document.getElementById('swatch-'+k).style.background = colors[k];
+    document.getElementById('hex-'+k).textContent = colors[k];
+    document.getElementById('color-'+k).value = colors[k];
+  });
+  applyTrophyColors('#dfc8ff','#4b2e83');
+  document.getElementById('range-cardvalsize').value = 18;
+  document.getElementById('val-cardvalsize').textContent = 18;
+  applyCardValSize(18);
+  document.getElementById('range-cardlblsize').value = 8;
+  document.getElementById('val-cardlblsize').textContent = 8;
+  applyCardLblSize(8);
+  document.getElementById('txt-label-date').value = '📅 Date';
+  document.getElementById('txt-label-loc').value = '📍 Location';
+  document.getElementById('txt-label-fmt').value = '🎯 Format';
+  applyCardLabel('date','📅 Date');
+  applyCardLabel('loc','📍 Location');
+  applyCardLabel('fmt','🎯 Format');
+  colors.cardval = '#ffffff'; colors.cardbg = '#000000';
+  ['cardval','cardbg'].forEach(k => {
+    document.getElementById('swatch-'+k).style.background = colors[k];
+    document.getElementById('hex-'+k).textContent = colors[k];
+    document.getElementById('color-'+k).value = colors[k];
+  });
+  document.querySelectorAll('.flyer-info-val').forEach(el => el.style.color = '#ffffff');
+  document.querySelectorAll('.flyer-info-card').forEach(el => el.style.background = 'rgba(0,0,0,0.3)');
+  document.getElementById('font-title').value = "'Bebas Neue', sans-serif";
+  document.getElementById('fl-title').style.fontFamily = "'Bebas Neue', sans-serif";
+  showToast('Reset to defaults');
+}
+
+// ===== HELPERS =====
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1,3),16);
+  const g = parseInt(hex.slice(3,5),16);
+  const b = parseInt(hex.slice(5,7),16);
+  return `rgba(${r},${g},${b},${alpha})`;
+}
+
+function shadeColor(hex, pct) {
+  let r = parseInt(hex.slice(1,3),16);
+  let g = parseInt(hex.slice(3,5),16);
+  let b = parseInt(hex.slice(5,7),16);
+  r = Math.min(255, Math.max(0, r + pct));
+  g = Math.min(255, Math.max(0, g + pct));
+  b = Math.min(255, Math.max(0, b + pct));
+  return '#' + [r,g,b].map(v=>v.toString(16).padStart(2,'0')).join('');
+}
+
+function showToast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ===== QR CODE UPLOADS =====
+// Hidden file inputs for each QR slot
+const qrInputs = {};
+['rsvp','foodtruck'].forEach(key => {
+  const inp = document.createElement('input');
+  inp.type = 'file'; inp.accept = 'image/*';
+  inp.style.display = 'none';
+  inp.addEventListener('change', () => handleQrUpload(key, inp));
+  document.body.appendChild(inp);
+  qrInputs[key] = inp;
+});
+
+function triggerQrUpload(key) {
+  qrInputs[key].click();
+}
+
+function handleQrUpload(key, input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const src = e.target.result;
+    if (key === 'rsvp') {
+      // Replace slot content with the image
+      const inner = document.getElementById('rsvp-qr-inner');
+      inner.innerHTML = `<img src="${src}" class="qr-uploaded-img" alt="RSVP QR">`;
+      // Update panel zone preview
+      const zone = document.getElementById('rsvp-panel-zone');
+      if (zone) zone.innerHTML = `<img src="${src}" style="width:80px;height:80px;object-fit:contain;border-radius:4px;border:1px solid rgba(255,255,255,0.1)" alt="RSVP QR"><div class="upload-hint" style="margin-top:6px;font-size:10px;color:rgba(155,109,255,0.8)">✓ Uploaded — click to change</div>`;
+    } else if (key === 'foodtruck') {
+      const slot = document.getElementById('foodtruck-qr-slot');
+      slot.innerHTML = `<img src="${src}" class="qr-uploaded-img" alt="Food Truck QR">`;
+      // Re-attach click
+      slot.onclick = () => triggerQrUpload('foodtruck');
+      // Update panel zone preview
+      const zone = document.getElementById('foodtruck-panel-zone');
+      if (zone) zone.innerHTML = `<img src="${src}" style="width:80px;height:80px;object-fit:contain;border-radius:4px;border:1px solid rgba(255,255,255,0.1)" alt="Food Truck QR"><div class="upload-hint" style="margin-top:6px;font-size:10px;color:rgba(155,109,255,0.8)">✓ Uploaded — click to change</div>`;
+    }
+    showToast('QR code uploaded!');
+  };
+  reader.readAsDataURL(file);
+}
+
+// ===== BACKGROUND IMAGE =====
+let bgImageUrl = null;
+
+function handleBgUpload(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    bgImageUrl = e.target.result;
+    applyBgImage();
+    // Show preview in upload zone
+    const zone = document.getElementById('upload-zone');
+    zone.innerHTML = `
+      <img class="upload-preview" src="${bgImageUrl}" alt="Background preview">
+      <div class="upload-hint" style="font-size:11px;color:rgba(155,109,255,0.8)">✓ Image loaded — click to change</div>
+    `;
+    zone.onclick = () => document.getElementById('bg-upload').click();
+    document.getElementById('bg-image-controls').style.display = 'block';
+    showToast('Background image applied!');
+  };
+  reader.readAsDataURL(file);
+}
+
+function applyBgImage() {
+  const layer = document.getElementById('flyer-bg-img');
+  if (!bgImageUrl) return;
+  layer.style.backgroundImage = `url(${bgImageUrl})`;
+  layer.style.backgroundSize = document.getElementById('sel-bgsize')?.value || 'cover';
+  layer.style.backgroundPosition = document.getElementById('sel-bgpos')?.value || 'center center';
+  const opacity = (document.getElementById('range-bgopacity')?.value || 60) / 100;
+  layer.style.opacity = opacity;
+  applyOverlay(document.getElementById('range-overlay')?.value || 55);
+}
+
+function applyBgOpacity(val) {
+  document.getElementById('flyer-bg-img').style.opacity = val / 100;
+  document.getElementById('val-bgopacity').textContent = val + '%';
+}
+
+function applyBgPos(val) {
+  document.getElementById('flyer-bg-img').style.backgroundPosition = val;
+}
+
+function applyBgSize(val) {
+  document.getElementById('flyer-bg-img').style.backgroundSize = val;
+}
+
+function applyOverlay(val) {
+  document.getElementById('val-overlay').textContent = val + '%';
+  const alpha = val / 100;
+  const bg = colors.bg || '#1a0a2e';
+  document.getElementById('flyer-bg-overlay').style.background =
+    `linear-gradient(to bottom, ${hexToRgba(bg, alpha * 0.8)} 0%, ${hexToRgba(bg, alpha * 0.4)} 40%, ${hexToRgba(bg, alpha * 0.7)} 100%)`;
+}
+
+function removeBgImage() {
+  bgImageUrl = null;
+  document.getElementById('flyer-bg-img').style.backgroundImage = 'none';
+  document.getElementById('flyer-bg-overlay').style.background = 'none';
+  document.getElementById('bg-image-controls').style.display = 'none';
+  const zone = document.getElementById('upload-zone');
+  zone.innerHTML = `
+    <input type="file" id="bg-upload" accept="image/*" style="display:none" onchange="handleBgUpload(this)">
+    <div class="upload-icon">🖼</div>
+    <div class="upload-hint">Click or drag an image here</div>
+    <div class="upload-sub">JPG, PNG, GIF, WebP</div>
+  `;
+  zone.onclick = () => document.getElementById('bg-upload').click();
+  showToast('Background image removed');
+}
+
+// Drag & drop support
+document.addEventListener('DOMContentLoaded', () => {
+  const zone = document.getElementById('upload-zone');
+  zone.addEventListener('click', () => document.getElementById('bg-upload').click());
+  zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('dragover'); });
+  zone.addEventListener('dragleave', () => zone.classList.remove('dragover'));
+  zone.addEventListener('drop', e => {
+    e.preventDefault();
+    zone.classList.remove('dragover');
+    const file = e.dataTransfer.files[0];
+    if (file && file.type.startsWith('image/')) {
+      const dt = new DataTransfer();
+      dt.items.add(file);
+      document.getElementById('bg-upload').files = dt.files;
+      handleBgUpload(document.getElementById('bg-upload'));
+    }
+  });
+});
+
+// ===== INIT =====
+renderColors();
+setTimeout(fitZoom, 100);
+window.addEventListener('resize', fitZoom);
+</script><input type="file" accept="image/*" style="display: none;"><input type="file" accept="image/*" style="display: none;">
+
+
+</body></html>
